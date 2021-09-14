@@ -7,6 +7,6 @@ import retrofit2.http.GET
 interface ShopService {
 
     @GET("shops")
-    fun getShopList () : Call<List<ShopData>>
+    fun getShopList () : Call<List<ShopData.Shop>>
 
 }
