@@ -24,13 +24,6 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        //call recycler
-//        lemondoRecyclerView = binding.recyclerViewId
-//        lemondoRecyclerView.layoutManager = LinearLayoutManager(this)
-//        lemondoRecyclerView.setHasFixedSize(true)
-
-//        loadShops()
-
         //initiate the service
         val destinationService  = ServiceBuilder.buildService(ShopService::class.java)
         val requestCall =destinationService.getShopList()
@@ -56,32 +49,4 @@ class MainActivity : AppCompatActivity() {
         })
 
     }
-
-//    private fun loadShops(){
-//        //initiate the service
-//        val destinationService  = ServiceBuilder.buildService(ShopService::class.java)
-//        val requestCall =destinationService.getShopList()
-//        //make network call asynchronously
-//        requestCall.enqueue(object : Callback<List<ShopData.Shop>>{
-//            override fun onResponse(call: Call<List<ShopData.Shop>>, response: Response<List<ShopData.Shop>>) {
-//                Log.d("Response", "onResponse: ${response.body()}")
-//                if (response.isSuccessful){
-//                    val countryList  = response.body()!!
-//                    Log.d("Response", "countrylist size : ${countryList.size}")
-//                    binding.recyclerViewId.apply {
-//                        setHasFixedSize(true)
-//                        layoutManager = GridLayoutManager(this@MainActivity,2)
-//                        adapter = ShopAdapter(response.body()!!)
-//                    }
-//                }else{
-//                    Toast.makeText(this@MainActivity, "Something went wrong ${response.message()}", Toast.LENGTH_SHORT).show()
-//                }
-//            }
-//            override fun onFailure(call: Call<List<ShopData.Shop>>, t: Throwable) {
-//                Toast.makeText(this@MainActivity, "Something went wrong $t", Toast.LENGTH_SHORT).show()
-//            }
-//        })
-
-
-
 }
