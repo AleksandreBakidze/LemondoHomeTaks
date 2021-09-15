@@ -41,7 +41,7 @@ class HomeFragment : Fragment() {
         linearLayoutManager = LinearLayoutManager(activity)
         binding.recyclerViewId.layoutManager = linearLayoutManager
 
-        //getData()
+        getData()
 
         return binding.root
     }
@@ -64,11 +64,9 @@ class HomeFragment : Fragment() {
                 binding.recyclerViewId.adapter = shopAdapter
 
             }
-
             override fun onFailure(call: Call<List<ShopData.Shop>?>, t: Throwable) {
                 Toast.makeText(activity, "Failed", Toast.LENGTH_SHORT).show()
             }
-
         })
     }
 }

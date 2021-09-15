@@ -46,7 +46,5 @@ class ShopAdapter (val context: Context, private val shopList: List<ShopData.Sho
             Picasso.get().load(shop.logoUrl).into(iconImage)
 
         }
-
     }
-
 }
