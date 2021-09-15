@@ -1,5 +1,6 @@
 package com.example.homework01.helper
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,7 +11,7 @@ import com.example.homework01.R
 import com.example.homework01.models.ShopData
 import com.squareup.picasso.Picasso
 
-class ShopAdapter (private val shopList: List<ShopData.Shop>) :RecyclerView.Adapter<ShopAdapter.shopViewHolder>(){
+class ShopAdapter (val context: Context, private val shopList: List<ShopData.Shop>) :RecyclerView.Adapter<ShopAdapter.shopViewHolder>(){
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): shopViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.shop_row_layout, parent, false)
@@ -18,6 +19,9 @@ class ShopAdapter (private val shopList: List<ShopData.Shop>) :RecyclerView.Adap
     }
 
     override fun onBindViewHolder(holder: shopViewHolder, position: Int) {
+        holder.brandName.text = shopList[position].name
+        holder.orderNumber.text = shopList[position].orderNo.toString()
+        //TODO: background and icon image parsing
         return holder.bind(shopList[position])
     }
 
