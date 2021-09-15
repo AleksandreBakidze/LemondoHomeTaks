@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.homework01.databinding.FragmentHomeBinding
+import com.example.homework01.helper.Constants
 import com.example.homework01.helper.ShopAdapter
 import com.example.homework01.models.ShopData
 import com.example.homework01.services.ShopService
@@ -16,8 +17,6 @@ import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-
-const val BASE_URL = "https://moitane-api.lemon.do/"
 
 class HomeFragment : Fragment() {
     private var _binding: FragmentHomeBinding? = null
@@ -49,7 +48,7 @@ class HomeFragment : Fragment() {
     private fun getData() {
         val retrofitBuilder = Retrofit.Builder()
             .addConverterFactory(GsonConverterFactory.create())
-            .baseUrl(BASE_URL)
+            .baseUrl(Constants.BASE_URL)
             .build()
             .create(ShopService::class.java)
 
