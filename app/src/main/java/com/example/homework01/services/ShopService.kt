@@ -17,14 +17,13 @@ interface ShopService {
     @POST(Constants.TOKEN_END_POINT)
     @FormUrlEncoded
     fun getToken (
-        @Field("flow_type")
-        flow_type: String,
+        @Field("grant_type")
+        grant_type: String,
         @Field("client_id")
         client_id: String,
         @Field("client_secret")
         client_secret: String,
         @Field("scope")
         scope: String,
-    ) : Call<List<AuthToken>>
-
+    ) : Call<AuthToken>
 }

@@ -32,10 +32,10 @@ class ShopAdapter (val context: Context, private val shopList: List<ShopData.Sho
     class shopViewHolder (itemView : View) :RecyclerView.ViewHolder(itemView){
 
         //Find id's
-        var backgroundImage = itemView.findViewById<ImageView>(R.id.main_img_iv)
-        var iconImage = itemView.findViewById<ImageView>(R.id.brand_img_iv)
-        val brandName = itemView.findViewById<TextView>(R.id.brand_name_tv)
-        var orderNumber = itemView.findViewById<TextView>(R.id.order_number_tv)
+        var backgroundImage: ImageView = itemView.findViewById(R.id.main_img_iv)
+        var iconImage: ImageView = itemView.findViewById(R.id.brand_img_iv)
+        val brandName: TextView = itemView.findViewById(R.id.brand_name_tv)
+        var orderNumber: TextView = itemView.findViewById(R.id.order_number_tv)
 
         fun bind(shop: ShopData.Shop) {
 
