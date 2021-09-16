@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.homework01.databinding.FragmentHomeBinding
 import com.example.homework01.helper.Constants
@@ -14,8 +15,13 @@ import com.example.homework01.helper.Constants.CLIENT_SECRET
 import com.example.homework01.helper.Constants.FLOW_TYPE
 import com.example.homework01.helper.Constants.SCOPE
 import com.example.homework01.helper.ShopAdapter
+import com.example.homework01.helper.StoreToken
 import com.example.homework01.models.AuthToken
+import com.example.homework01.models.ShopData
+import com.example.homework01.services.AuthInterceptor
 import com.example.homework01.services.ShopService
+import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -28,6 +34,7 @@ class HomeFragment : Fragment() {
 
     private lateinit var shopAdapter: ShopAdapter
     private lateinit var linearLayoutManager: LinearLayoutManager
+    lateinit var authInterceptor: AuthInterceptor
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,15 +57,34 @@ class HomeFragment : Fragment() {
     }
 
     private fun getData() {
+        authInterceptor = AuthInterceptor()
+
+        val loggingInterceptor = HttpLoggingInterceptor().apply {
+            level = HttpLoggingInterceptor.Level.BODY
+        }
+
         val retrofitBuilder = Retrofit.Builder()
             .addConverterFactory(GsonConverterFactory.create())
             .baseUrl(Constants.BASE_URL)
+            .client(OkHttpClient().newBuilder()
+                .addInterceptor(authInterceptor)
+                .addInterceptor(loggingInterceptor)
+                .build())
             .build()
             .create(ShopService::class.java)
 
         val tokenData = retrofitBuilder.getToken(FLOW_TYPE, CLIENT_ID, CLIENT_SECRET, SCOPE)
         tokenData.enqueue(object : Callback<AuthToken> {
             override fun onResponse(call: Call<AuthToken>, response: Response<AuthToken>) {
+                if (response.isSuccessful){
+                    val token = response.body()
+                    token?.access_token.let {
+                        if (it != null) {
+                            StoreToken.saveToken(it)
+                            //getShop()
+                        }
+                    }
+                }
                 Log.e("data", "${response.isSuccessful}")
                 Log.e("data", "${response.body()?.access_token}")
             }
