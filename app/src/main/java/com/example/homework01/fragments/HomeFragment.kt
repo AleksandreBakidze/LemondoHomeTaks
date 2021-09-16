@@ -35,6 +35,7 @@ class HomeFragment : Fragment() {
     private lateinit var shopAdapter: ShopAdapter
     private lateinit var linearLayoutManager: LinearLayoutManager
     lateinit var authInterceptor: AuthInterceptor
+    private lateinit var  retrofitBuilder: ShopService
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,7 +64,7 @@ class HomeFragment : Fragment() {
             level = HttpLoggingInterceptor.Level.BODY
         }
 
-        val retrofitBuilder = Retrofit.Builder()
+        retrofitBuilder = Retrofit.Builder()
             .addConverterFactory(GsonConverterFactory.create())
             .baseUrl(Constants.BASE_URL)
             .client(OkHttpClient().newBuilder()
@@ -78,36 +79,40 @@ class HomeFragment : Fragment() {
             override fun onResponse(call: Call<AuthToken>, response: Response<AuthToken>) {
                 if (response.isSuccessful){
                     val token = response.body()
-                    token?.access_token.let {
-                        if (it != null) {
-                            StoreToken.saveToken(it)
-                            //getShop()
-                        }
-                    }
+                    StoreToken.saveToken(response.body()!!.access_token)
+                    getShop()
+//                    token?.access_token.let {
+//                        if (it != null) {
+//
+//                        }
+//                    }
                 }
                 Log.e("data", "${response.isSuccessful}")
                 Log.e("data", "${response.body()?.access_token}")
             }
 
             override fun onFailure(call: Call<AuthToken>, t: Throwable) {
-                Log.e("data", "${t.message}")
+                Log.e("error", "${t.message}")
             }
         })
+    }
 
-//        val retrofitData = retrofitBuilder.getShopList()
+    fun getShop() {
+        val retrofitData = retrofitBuilder.getShopList()
 
-//        retrofitData.enqueue(object : Callback<List<ShopData.Shop>?> {
-//            override fun onResponse(call: Call<List<ShopData.Shop>?>, response: Response<List<ShopData.Shop>?>) {
-//                val responseBody = response.body()!!
-//
-//                shopAdapter = ShopAdapter(activity!!.baseContext, responseBody)
-//                shopAdapter.notifyDataSetChanged()
-//                binding.recyclerViewId.adapter = shopAdapter
-//
-//            }
-//            override fun onFailure(call: Call<List<ShopData.Shop>?>, t: Throwable) {
-//                Toast.makeText(activity, "Failed", Toast.LENGTH_SHORT).show()
-//            }
-//        })
+        retrofitData.enqueue(object : Callback<List<ShopData.Shop>?> {
+            override fun onResponse(call: Call<List<ShopData.Shop>?>, response: Response<List<ShopData.Shop>?>) {
+
+                val responseBody = response.body()!!
+
+                shopAdapter = ShopAdapter(activity!!.baseContext, responseBody)
+                shopAdapter.notifyDataSetChanged()
+                binding.recyclerViewId.adapter = shopAdapter
+
+            }
+            override fun onFailure(call: Call<List<ShopData.Shop>?>, t: Throwable) {
+                Toast.makeText(activity, "Failed", Toast.LENGTH_SHORT).show()
+            }
+        })
     }
 }
