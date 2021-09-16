@@ -15,7 +15,6 @@ import com.example.homework01.helper.Constants.FLOW_TYPE
 import com.example.homework01.helper.Constants.SCOPE
 import com.example.homework01.helper.ShopAdapter
 import com.example.homework01.models.AuthToken
-import com.example.homework01.models.ShopData
 import com.example.homework01.services.ShopService
 import retrofit2.Call
 import retrofit2.Callback
@@ -67,10 +66,9 @@ class HomeFragment : Fragment() {
             override fun onFailure(call: Call<AuthToken>, t: Throwable) {
                 Log.e("data", "${t.message}")
             }
-
         })
 
-      //  val retrofitData = retrofitBuilder.getShopList()
+//        val retrofitData = retrofitBuilder.getShopList()
 
 //        retrofitData.enqueue(object : Callback<List<ShopData.Shop>?> {
 //            override fun onResponse(call: Call<List<ShopData.Shop>?>, response: Response<List<ShopData.Shop>?>) {
