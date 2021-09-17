@@ -12,7 +12,7 @@ import com.example.homework01.databinding.FragmentHomeBinding
 import com.example.homework01.helper.Constants
 import com.example.homework01.helper.Constants.CLIENT_ID
 import com.example.homework01.helper.Constants.CLIENT_SECRET
-import com.example.homework01.helper.Constants.FLOW_TYPE
+import com.example.homework01.helper.Constants.GRANT_TYPE
 import com.example.homework01.helper.Constants.SCOPE
 import com.example.homework01.helper.ShopAdapter
 import com.example.homework01.helper.StoreToken
@@ -69,26 +69,18 @@ class HomeFragment : Fragment() {
             .baseUrl(Constants.BASE_URL)
             .client(OkHttpClient().newBuilder()
                 .addInterceptor(authInterceptor)
-                .addInterceptor(loggingInterceptor)
-                .build())
+                .addInterceptor(loggingInterceptor).build())
             .build()
             .create(ShopService::class.java)
 
-        val tokenData = retrofitBuilder.getToken(FLOW_TYPE, CLIENT_ID, CLIENT_SECRET, SCOPE)
+        val tokenData = retrofitBuilder.getToken(GRANT_TYPE, CLIENT_ID, CLIENT_SECRET, SCOPE)
         tokenData.enqueue(object : Callback<AuthToken> {
             override fun onResponse(call: Call<AuthToken>, response: Response<AuthToken>) {
                 if (response.isSuccessful){
-                    val token = response.body()
-                    StoreToken.saveToken(response.body()!!.access_token)
+                    val token = response.body()?.access_token!!
+                    StoreToken.saveToken(token)
                     getShop()
-//                    token?.access_token.let {
-//                        if (it != null) {
-//
-//                        }
-//                    }
                 }
-                Log.e("data", "${response.isSuccessful}")
-                Log.e("data", "${response.body()?.access_token}")
             }
 
             override fun onFailure(call: Call<AuthToken>, t: Throwable) {
