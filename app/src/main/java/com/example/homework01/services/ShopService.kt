@@ -12,7 +12,7 @@ import retrofit2.http.POST
 interface ShopService {
 
     @GET(Constants.END_POINT)
-    fun getShopList () : Call<List<ShopData.Shop>>
+    fun getShopList () : Call<ShopData>
 
     @POST(Constants.TOKEN_END_POINT)
     @FormUrlEncoded

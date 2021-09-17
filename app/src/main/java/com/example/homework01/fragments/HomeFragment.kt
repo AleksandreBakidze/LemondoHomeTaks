@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.homework01.databinding.FragmentHomeBinding
 import com.example.homework01.helper.Constants
 import com.example.homework01.helper.Constants.CLIENT_ID
@@ -17,6 +18,7 @@ import com.example.homework01.helper.Constants.SCOPE
 import com.example.homework01.helper.ShopAdapter
 import com.example.homework01.helper.StoreToken
 import com.example.homework01.models.AuthToken
+import com.example.homework01.models.Shop
 import com.example.homework01.models.ShopData
 import com.example.homework01.services.AuthInterceptor
 import com.example.homework01.services.ShopService
@@ -33,9 +35,12 @@ class HomeFragment : Fragment() {
     private val binding get() = _binding!!
 
     private lateinit var shopAdapter: ShopAdapter
-    private lateinit var linearLayoutManager: LinearLayoutManager
+
     lateinit var authInterceptor: AuthInterceptor
+
     private lateinit var  retrofitBuilder: ShopService
+    private lateinit var lemondoArrayList: ArrayList<Shop>
+    private lateinit var lemondoRecyclerView: RecyclerView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,9 +53,11 @@ class HomeFragment : Fragment() {
         // Inflate the layout for this fragment
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
 
-        binding.recyclerViewId.setHasFixedSize(true)
-        linearLayoutManager = LinearLayoutManager(activity)
-        binding.recyclerViewId.layoutManager = linearLayoutManager
+        lemondoRecyclerView = binding.recyclerViewId
+        lemondoRecyclerView.layoutManager = LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, false)
+       // lemondoRecyclerView.setHasFixedSize(true)
+
+        lemondoArrayList = arrayListOf<Shop>()
 
         getData()
 
@@ -92,17 +99,17 @@ class HomeFragment : Fragment() {
     fun getShop() {
         val retrofitData = retrofitBuilder.getShopList()
 
-        retrofitData.enqueue(object : Callback<List<ShopData.Shop>?> {
-            override fun onResponse(call: Call<List<ShopData.Shop>?>, response: Response<List<ShopData.Shop>?>) {
+        retrofitData.enqueue(object : Callback<ShopData> {
+            override fun onResponse(call: Call<ShopData>?, response: Response<ShopData>?) {
 
-                val responseBody = response.body()!!
+                val responseBody = response?.body()?.shops
 
-                shopAdapter = ShopAdapter(activity!!.baseContext, responseBody)
+                shopAdapter = ShopAdapter(responseBody!!)
                 shopAdapter.notifyDataSetChanged()
-                binding.recyclerViewId.adapter = shopAdapter
+                lemondoRecyclerView.adapter = shopAdapter
 
             }
-            override fun onFailure(call: Call<List<ShopData.Shop>?>, t: Throwable) {
+            override fun onFailure(call: Call<ShopData>?, t: Throwable) {
                 Toast.makeText(activity, "Failed", Toast.LENGTH_SHORT).show()
             }
         })

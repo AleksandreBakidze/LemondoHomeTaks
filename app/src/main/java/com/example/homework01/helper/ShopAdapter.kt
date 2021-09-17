@@ -1,6 +1,5 @@
 package com.example.homework01.helper
 
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,43 +7,35 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.homework01.R
+import com.example.homework01.models.Shop
 import com.example.homework01.models.ShopData
-import com.squareup.picasso.Picasso
 
-class ShopAdapter (val context: Context, private val shopList: List<ShopData.Shop>) :RecyclerView.Adapter<ShopAdapter.shopViewHolder>(){
+class ShopAdapter (private val shopList: List<Shop>) :RecyclerView.Adapter<ShopAdapter.ShopViewHolder>(){
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): shopViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ShopViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.shop_row_layout, parent, false)
-        return shopViewHolder(view)
+        return ShopViewHolder(view)
     }
 
-    override fun onBindViewHolder(holder: shopViewHolder, position: Int) {
-        holder.brandName.text = shopList[position].name
-        holder.orderNumber.text = shopList[position].orderNo.toString()
-        //TODO: background and icon image parsing
-        return holder.bind(shopList[position])
+    override fun onBindViewHolder(holder: ShopViewHolder, position: Int) {
+        val currentPosition = shopList[position]
+        holder.brandName.text = currentPosition.name
+        holder.orderNumber.text = currentPosition.orderNo.toString()
+
+        holder.itemView
     }
 
     override fun getItemCount(): Int {
         return shopList.size
     }
 
-    class shopViewHolder (itemView : View) :RecyclerView.ViewHolder(itemView){
+    class ShopViewHolder (itemView : View) :RecyclerView.ViewHolder(itemView){
 
-        //Find id's
+        //Find id's From row
         var backgroundImage: ImageView = itemView.findViewById(R.id.main_img_iv)
         var iconImage: ImageView = itemView.findViewById(R.id.brand_img_iv)
         val brandName: TextView = itemView.findViewById(R.id.brand_name_tv)
         var orderNumber: TextView = itemView.findViewById(R.id.order_number_tv)
 
-        fun bind(shop: ShopData.Shop) {
-
-            //Set data from database
-            brandName.text = shop.name
-            orderNumber.text = shop.orderNo.toString()
-            Picasso.get().load(shop.backgroundUrl).into(backgroundImage)
-            Picasso.get().load(shop.logoUrl).into(iconImage)
-
-        }
     }
 }
