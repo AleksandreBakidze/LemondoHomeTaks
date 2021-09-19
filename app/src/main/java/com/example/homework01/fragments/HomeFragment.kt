@@ -1,5 +1,6 @@
 package com.example.homework01.fragments
 
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -7,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.homework01.databinding.FragmentHomeBinding
@@ -29,6 +31,9 @@ import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.time.format.DateTimeFormatter
+import java.util.*
+import kotlin.collections.ArrayList
 
 class HomeFragment : Fragment() {
     private var _binding: FragmentHomeBinding? = null
@@ -46,6 +51,7 @@ class HomeFragment : Fragment() {
         super.onCreate(savedInstanceState)
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -55,11 +61,19 @@ class HomeFragment : Fragment() {
 
         lemondoRecyclerView = binding.recyclerViewId
         lemondoRecyclerView.layoutManager = LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, false)
-       // lemondoRecyclerView.setHasFixedSize(true)
+        //lemondoRecyclerView.setHasFixedSize(true)
 
         lemondoArrayList = arrayListOf<Shop>()
 
         getData()
+
+//        //Get Current Day Int Mon = 1 , Thu = 2 ...
+//        var currentDate = Calendar.getInstance()
+//        var currentDay = currentDate[Calendar.DAY_OF_WEEK]
+//        currentDay--
+
+
+//        Log.e("currentTime", "$currentDay")
 
         return binding.root
     }
