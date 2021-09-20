@@ -67,17 +67,10 @@ class HomeFragment : Fragment() {
 
         getData()
 
-//        //Get Current Day Int Mon = 1 , Thu = 2 ...
-//        var currentDate = Calendar.getInstance()
-//        var currentDay = currentDate[Calendar.DAY_OF_WEEK]
-//        currentDay--
-
-
-//        Log.e("currentTime", "$currentDay")
-
         return binding.root
     }
 
+    //Get token
     private fun getData() {
         authInterceptor = AuthInterceptor()
 

@@ -1,5 +1,7 @@
 package com.example.homework01.helper
 
+import android.icu.text.SimpleDateFormat
+import android.icu.util.LocaleData
 import android.os.Build
 import android.util.Log
 import android.view.LayoutInflater
@@ -11,7 +13,6 @@ import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.example.homework01.R
 import com.example.homework01.fragments.HomeFragment
 import com.example.homework01.models.Shop
@@ -24,12 +25,14 @@ import java.time.format.DateTimeFormatter
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-class ShopAdapter (private val shopList: List<Shop>) :RecyclerView.Adapter<ShopAdapter.ShopViewHolder>(){
+class ShopAdapter(private val shopList: List<Shop>) :
+    RecyclerView.Adapter<ShopAdapter.ShopViewHolder>() {
 
     private val workingHour: MutableList<WorkingHour> = mutableListOf()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ShopViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.shop_row_layout, parent, false)
+        val view =
+            LayoutInflater.from(parent.context).inflate(R.layout.shop_row_layout, parent, false)
         return ShopViewHolder(view)
     }
 
@@ -45,21 +48,13 @@ class ShopAdapter (private val shopList: List<Shop>) :RecyclerView.Adapter<ShopA
         Picasso.get().load(currentPosition.backgroundUrl).into(holder.backgroundImage)
         Picasso.get().load(currentPosition.logoUrl).into(holder.iconImage)
 
-//TODO: Convert miliseconds to time
-//        fun formatToDigitalClock(miliSeconds: Long): String {
-//            val hours = TimeUnit.MILLISECONDS.toHours(miliSeconds).toInt() % 24
-//            val minutes = TimeUnit.MILLISECONDS.toMinutes(miliSeconds).toInt() % 60
-//            val seconds = TimeUnit.MILLISECONDS.toSeconds(miliSeconds).toInt() % 60
-//            return when {
-//                hours > 0 -> String.format("%d:%02d:%02d", hours, minutes, seconds)
-//                minutes > 0 -> String.format("%02d:%02d", minutes, seconds)
-//                seconds > 0 -> String.format("00:%02d", seconds)
-//                else -> {
-//                    "00:00"
-//                }
-//            }
-//        }
+        //yyyy MM dd hh:mm:ss
 
+        fun convertDate(date: String): Long{
+            val formatter2 = DateTimeFormatter.ofPattern("EEEE MMM dd yyyy HH:mm:ss")
+            val localDateTime = LocalDateTime.parse(date, formatter2)
+            return localDateTime.atOffset(ZoneOffset.UTC).toInstant().toEpochMilli()
+        }
 
         //Get Current Day Int Mon = 1 , Thu = 2 ...
         var currentDate = Calendar.getInstance()
@@ -67,40 +62,68 @@ class ShopAdapter (private val shopList: List<Shop>) :RecyclerView.Adapter<ShopA
         //To start from monday
         currentDay--
 
-        var currentTime = Calendar.getInstance().timeInMillis
+        //current date
+        var currentTime = Calendar.getInstance().time
+        var formatter = SimpleDateFormat("EEEE MMM dd yyyy HH:mm:ss")
+        var formatedData = formatter.format(currentTime)
+        var currentLastDate = convertDate(formatedData)
+
+        //api date open
+        val apiTime = currentPosition.workingHours[position].from
+        val formatter1 = SimpleDateFormat("EEEE MMM dd yyyy ")
+        val apiDate = formatter1.format(currentTime)
+        //val apiDataFormatted = SimpleDateFormat("HH:mm:ss")
+        val finalOpen = "$apiDate $apiDate"
+        var openLastDate = convertDate(finalOpen)
+
+        //api date close
+        val apiTime1 = currentPosition.workingHours[position].to
+        val formatter2 = SimpleDateFormat("EEEE MMM dd yyyy ")
+        val apiDate1 = formatter2.format(currentTime)
+        //val apiDataFormatter1 = SimpleDateFormat("HH:mm:ss")
+        val finalClose = "$apiDate1 $apiDate1"
+        var closeLastDate = convertDate(finalClose)
+
+        //Range start to end
+        val range = openLastDate..closeLastDate
 
         //AM or PM
         val dayOrNight = currentDate[Calendar.AM_PM]
 
         // open and close time
         val openTime = currentPosition.workingHours[position].from
-//        val openTimeMillisec = formatToDigitalClock(currentTime.toLong())
         val closeTime = currentPosition.workingHours[position].to
 
         //Working or not
-        val isWorking = currentPosition.workingHours[position].working
+        var isWorking = currentPosition.workingHours[position].working
 
-        //holder.orderNumber.text = currentTime.toString()
+        for (item in currentPosition.workingHours) {
+            //val range = finalOpen..finalClose
 
-        //Checking if shop is open
-        if (currentDay == 1){
-            holder.moonIcon.isVisible = false
-            holder.openingTime.isVisible = false
-            holder.planeOrder.isVisible = false
-            holder.closedBlur.isVisible = false
+            //Checking if shop is open
+            if (isWorking) {
+                holder.moonIcon.isVisible = false
+                holder.openingTime.isVisible = false
+                holder.planeOrder.isVisible = false
+                holder.closedBlur.isVisible = false
+            }
         }
 
-        //Log.e("currentTime", "$openTimeMillisec")
+//        var millis: Long = currentTime
+//        var hhmmss: String = String.format("%02d:%02d:%02d", TimeUnit.MILLISECONDS.toHours(millis),
+//            TimeUnit.MILLISECONDS.toMinutes(millis) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(millis)),
+//            TimeUnit.MILLISECONDS.toSeconds(millis) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millis)))
+
+        Log.e("Formatter1", "$closeLastDate")
 
         holder.itemView.context
-
     }
 
     override fun getItemCount(): Int {
         return shopList.size - 1
     }
 
-    inner class ShopViewHolder (itemView : View) :RecyclerView.ViewHolder(itemView){
+    inner class ShopViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
         //Find id's From row
         var backgroundImage: ImageView = itemView.findViewById(R.id.main_img_iv)
@@ -113,6 +136,5 @@ class ShopAdapter (private val shopList: List<Shop>) :RecyclerView.Adapter<ShopA
         var openingTime: TextView = itemView.findViewById(R.id.opening_time_tv)
         var planeOrder: Button = itemView.findViewById(R.id.plane_order_btn)
         var closedBlur: View = itemView.findViewById(R.id.closed_blur_v)
-
     }
 }
