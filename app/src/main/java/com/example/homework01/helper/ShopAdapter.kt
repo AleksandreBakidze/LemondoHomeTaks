@@ -1,38 +1,26 @@
 package com.example.homework01.helper
 
-import android.icu.text.SimpleDateFormat
-import android.icu.util.LocaleData
 import android.os.Build
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.ImageView
-import android.widget.TextView
+import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.example.homework01.R
-import com.example.homework01.fragments.HomeFragment
 import com.example.homework01.models.Shop
-import com.example.homework01.models.ShopData
-import com.example.homework01.models.WorkingHour
 import com.squareup.picasso.Picasso
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import java.util.*
-import java.util.concurrent.TimeUnit
 
-class ShopAdapter(private val shopList: List<Shop>) :
-    RecyclerView.Adapter<ShopAdapter.ShopViewHolder>() {
-
-    private val workingHour: MutableList<WorkingHour> = mutableListOf()
+class ShopAdapter(private val shopList: List<Shop>):RecyclerView.Adapter<ShopAdapter.ShopViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ShopViewHolder {
-        val view =
-            LayoutInflater.from(parent.context).inflate(R.layout.shop_row_layout, parent, false)
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.shop_row_layout, parent, false)
         return ShopViewHolder(view)
     }
 
@@ -48,9 +36,7 @@ class ShopAdapter(private val shopList: List<Shop>) :
         Picasso.get().load(currentPosition.backgroundUrl).into(holder.backgroundImage)
         Picasso.get().load(currentPosition.logoUrl).into(holder.iconImage)
 
-        //yyyy MM dd hh:mm:ss
-
-        fun convertDate(date: String): Long{
+        fun convertDate(date: String): Long {
             val formatter2 = DateTimeFormatter.ofPattern("EEEE MMM dd yyyy HH:mm:ss")
             val localDateTime = LocalDateTime.parse(date, formatter2)
             return localDateTime.atOffset(ZoneOffset.UTC).toInstant().toEpochMilli()
@@ -62,61 +48,54 @@ class ShopAdapter(private val shopList: List<Shop>) :
         //To start from monday
         currentDay--
 
-        //current date
-        var currentTime = Calendar.getInstance().time
-        var formatter = SimpleDateFormat("EEEE MMM dd yyyy HH:mm:ss")
-        var formatedData = formatter.format(currentTime)
-        var currentLastDate = convertDate(formatedData)
+        //get and convert current date for converterDate
+        val openApiDate = LocalDateTime.now() // full current local date
+        val formatApiDate = DateTimeFormatter.ofPattern("EEEE MMM dd yyyy") //formatter for converter
+        val finalFormatter = openApiDate.format(formatApiDate) //format
+
+        //get and covert current data ad time to milliseconds
+        val formatApiDataTime = DateTimeFormatter.ofPattern("EEEE MMM dd yyyy HH:mm:ss") // format and get data and time
+        var finalFormatterDataTime = openApiDate.format(formatApiDataTime) // get current data and time
+        val convertFinalApiDate = convertDate(finalFormatterDataTime) // convert it to milliseconds
 
         //api date open
-        val apiTime = currentPosition.workingHours[position].from
-        val formatter1 = SimpleDateFormat("EEEE MMM dd yyyy ")
-        val apiDate = formatter1.format(currentTime)
-        //val apiDataFormatted = SimpleDateFormat("HH:mm:ss")
-        val finalOpen = "$apiDate $apiDate"
-        var openLastDate = convertDate(finalOpen)
+        val openApiTime = currentPosition.workingHours[position].from //open time from api
+        val finalApiDateOpen = "$finalFormatter $openApiTime" // final group date and time
+        val convertFinalApiDateOpen = convertDate(finalApiDateOpen) // convert to milliseconds
 
         //api date close
-        val apiTime1 = currentPosition.workingHours[position].to
-        val formatter2 = SimpleDateFormat("EEEE MMM dd yyyy ")
-        val apiDate1 = formatter2.format(currentTime)
-        //val apiDataFormatter1 = SimpleDateFormat("HH:mm:ss")
-        val finalClose = "$apiDate1 $apiDate1"
-        var closeLastDate = convertDate(finalClose)
+        val closeApiTime = currentPosition.workingHours[position].to //close time from api
+        val finalApiDateClose = "$finalFormatter $closeApiTime" // final group date and time
+        val convertFinalApiDateClose = convertDate(finalApiDateClose) // convert to milliseconds
 
         //Range start to end
-        val range = openLastDate..closeLastDate
+        val range = convertFinalApiDateOpen..convertFinalApiDateClose
 
         //AM or PM
-        val dayOrNight = currentDate[Calendar.AM_PM]
-
-        // open and close time
-        val openTime = currentPosition.workingHours[position].from
-        val closeTime = currentPosition.workingHours[position].to
+        var dayOrNight = currentDate[Calendar.AM_PM]
+        val dayTime = Calendar.AM
+        val nightTime = Calendar.PM
 
         //Working or not
         var isWorking = currentPosition.workingHours[position].working
 
         for (item in currentPosition.workingHours) {
-            //val range = finalOpen..finalClose
-
             //Checking if shop is open
-            if (isWorking) {
-                holder.moonIcon.isVisible = false
-                holder.openingTime.isVisible = false
-                holder.planeOrder.isVisible = false
-                holder.closedBlur.isVisible = false
+            if (!isWorking || !range.contains(convertFinalApiDate)) {
+                holder.moonIcon.isVisible = true
+                holder.openingTime.isVisible = true
+                holder.planeOrder.isVisible = true
+                holder.closedBlur.isVisible = true
+
+                if (dayOrNight == dayTime){
+                    holder.openingTime.text = currentPosition.workingHours[currentDay + 1].day +" "+ currentPosition.workingHours[position].from
+
+                }else if(dayOrNight == nightTime) {
+                    holder.openingTime.text = currentPosition.workingHours[currentDay].day + " " + currentPosition.workingHours[position].from
+                    Log.e("Formatter1122", "test")
+                }
             }
         }
-
-//        var millis: Long = currentTime
-//        var hhmmss: String = String.format("%02d:%02d:%02d", TimeUnit.MILLISECONDS.toHours(millis),
-//            TimeUnit.MILLISECONDS.toMinutes(millis) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(millis)),
-//            TimeUnit.MILLISECONDS.toSeconds(millis) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millis)))
-
-        Log.e("Formatter1", "$closeLastDate")
-
-        holder.itemView.context
     }
 
     override fun getItemCount(): Int {
