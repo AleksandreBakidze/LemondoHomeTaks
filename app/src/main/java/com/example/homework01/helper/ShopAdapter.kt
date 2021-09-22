@@ -17,10 +17,12 @@ import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import java.util.*
 
-class ShopAdapter(private val shopList: List<Shop>):RecyclerView.Adapter<ShopAdapter.ShopViewHolder>() {
+class ShopAdapter(private val shopList: List<Shop>) :
+    RecyclerView.Adapter<ShopAdapter.ShopViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ShopViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.shop_row_layout, parent, false)
+        val view =
+            LayoutInflater.from(parent.context).inflate(R.layout.shop_row_layout, parent, false)
         return ShopViewHolder(view)
     }
 
@@ -36,6 +38,7 @@ class ShopAdapter(private val shopList: List<Shop>):RecyclerView.Adapter<ShopAda
         Picasso.get().load(currentPosition.backgroundUrl).into(holder.backgroundImage)
         Picasso.get().load(currentPosition.logoUrl).into(holder.iconImage)
 
+        //milliseconds converter
         fun convertDate(date: String): Long {
             val formatter2 = DateTimeFormatter.ofPattern("EEEE MMM dd yyyy HH:mm:ss")
             val localDateTime = LocalDateTime.parse(date, formatter2)
@@ -45,26 +48,29 @@ class ShopAdapter(private val shopList: List<Shop>):RecyclerView.Adapter<ShopAda
         //Get Current Day Int Mon = 1 , Thu = 2 ...
         var currentDate = Calendar.getInstance()
         var currentDay = currentDate[Calendar.DAY_OF_WEEK]
-        //To start from monday
+        //get current day index
         currentDay--
 
         //get and convert current date for converterDate
         val openApiDate = LocalDateTime.now() // full current local date
-        val formatApiDate = DateTimeFormatter.ofPattern("EEEE MMM dd yyyy") //formatter for converter
+        val formatApiDate =
+            DateTimeFormatter.ofPattern("EEEE MMM dd yyyy") //formatter for converter
         val finalFormatter = openApiDate.format(formatApiDate) //format
 
-        //get and covert current data ad time to milliseconds
-        val formatApiDataTime = DateTimeFormatter.ofPattern("EEEE MMM dd yyyy HH:mm:ss") // format and get data and time
-        var finalFormatterDataTime = openApiDate.format(formatApiDataTime) // get current data and time
+        //get and convert current data ad time to milliseconds
+        val formatApiDataTime =
+            DateTimeFormatter.ofPattern("EEEE MMM dd yyyy HH:mm:ss") // format and get data and time
+        var finalFormatterDataTime =
+            openApiDate.format(formatApiDataTime) // get current data and time
         val convertFinalApiDate = convertDate(finalFormatterDataTime) // convert it to milliseconds
 
         //api date open
-        val openApiTime = currentPosition.workingHours[position].from //open time from api
+        val openApiTime = currentPosition.workingHours[currentDay].from //open time from api
         val finalApiDateOpen = "$finalFormatter $openApiTime" // final group date and time
         val convertFinalApiDateOpen = convertDate(finalApiDateOpen) // convert to milliseconds
 
         //api date close
-        val closeApiTime = currentPosition.workingHours[position].to //close time from api
+        val closeApiTime = currentPosition.workingHours[currentDay].to //close time from api
         val finalApiDateClose = "$finalFormatter $closeApiTime" // final group date and time
         val convertFinalApiDateClose = convertDate(finalApiDateClose) // convert to milliseconds
 
@@ -73,31 +79,31 @@ class ShopAdapter(private val shopList: List<Shop>):RecyclerView.Adapter<ShopAda
 
         //AM or PM
         var dayOrNight = currentDate[Calendar.AM_PM]
-        val dayTime = Calendar.AM
-        val nightTime = Calendar.PM
+        var dayTime = Calendar.AM
+        var nightTime = Calendar.PM
 
         //Working or not
-        var isWorking = currentPosition.workingHours[position].working
+        var isWorking = currentPosition.workingHours[currentDay].working
 
-        for (item in currentPosition.workingHours) {
-            //Checking if shop is open
-            if (!isWorking || !range.contains(convertFinalApiDate)) {
-                holder.moonIcon.isVisible = true
-                holder.openingTime.isVisible = true
-                holder.planeOrder.isVisible = true
-                holder.closedBlur.isVisible = true
+        //Checking if shop is open
+        if (!isWorking || !range.contains(convertFinalApiDate)) {
 
-                if (dayOrNight == dayTime){
-                    holder.openingTime.text = currentPosition.workingHours[currentDay + 1].day +" "+ currentPosition.workingHours[position].from
+            holder.moonIcon.isVisible = true
+            holder.openingTime.isVisible = true
+            holder.planeOrder.isVisible = true
+            holder.closedBlur.isVisible = true
 
-                }else if(dayOrNight == nightTime) {
-                    holder.openingTime.text = currentPosition.workingHours[currentDay].day + " " + currentPosition.workingHours[position].from
-                    Log.e("Formatter1122", "test")
-                }
+            if (dayOrNight == nightTime) {
+                holder.openingTime.text =
+                    currentPosition.workingHours[currentDay + 1].day + " " + currentPosition.workingHours[currentDay + 1].from
+
+            } else if (dayOrNight == dayTime) {
+                holder.openingTime.text =
+                    currentPosition.workingHours[currentDay].day + " " + currentPosition.workingHours[currentDay].from
+                Log.e("Formatter1122", "test")
             }
         }
     }
-
     override fun getItemCount(): Int {
         return shopList.size - 1
     }
