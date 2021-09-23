@@ -79,37 +79,56 @@ class ShopAdapter(private val shopList: List<Shop>) :
 
         //AM or PM
         var dayOrNight = currentDate[Calendar.AM_PM]
-        var dayTime = Calendar.AM
-        var nightTime = Calendar.PM
+        var dayTime = Calendar.AM //0
+        var nightTime = Calendar.PM //1
 
         //Working or not
         var isWorking = currentPosition.workingHours[currentDay].working
 
         //Checking if shop is open
         if (!isWorking || !range.contains(convertFinalApiDate)) {
-
             holder.moonIcon.isVisible = true
             holder.openingTime.isVisible = true
             holder.planeOrder.isVisible = true
             holder.closedBlur.isVisible = true
 
-            if (dayOrNight == nightTime) {
-                holder.openingTime.text =
-                    currentPosition.workingHours[currentDay + 1].day + " " + currentPosition.workingHours[currentDay + 1].from
+            if (currentDay + 1 == 7){
 
-            } else if (dayOrNight == dayTime) {
-                holder.openingTime.text =
-                    currentPosition.workingHours[currentDay].day + " " + currentPosition.workingHours[currentDay].from
-                Log.e("Formatter1122", "test")
+                currentDay = 0
+
+                currentPosition.workingHours[currentDay]
+
+                if (dayOrNight == nightTime) {
+                    holder.openingTime.text = currentPosition.workingHours[currentDay].day + " " + currentPosition.workingHours[currentDay].from
+
+                } else {
+                    holder.openingTime.text = currentPosition.workingHours[currentDay + 6].day + " " + currentPosition.workingHours[currentDay + 6].from
+                }
+
+            }else{
+                if (dayOrNight == nightTime) {
+                    holder.openingTime.text = currentPosition.workingHours[currentDay + 1].day + " " + currentPosition.workingHours[currentDay + 1].from
+                    Log.e("PM", "PM")
+
+                } else {
+                    holder.openingTime.text = currentPosition.workingHours[currentDay].day + " " + currentPosition.workingHours[currentDay].from
+                    Log.e("AM", "AM")
+                }
             }
+
+        } else {
+            holder.moonIcon.isVisible = false
+            holder.openingTime.isVisible = false
+            holder.planeOrder.isVisible = false
+            holder.closedBlur.isVisible = false
         }
     }
+
     override fun getItemCount(): Int {
-        return shopList.size - 1
+        return shopList.size
     }
 
     inner class ShopViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-
         //Find id's From row
         var backgroundImage: ImageView = itemView.findViewById(R.id.main_img_iv)
         var iconImage: ImageView = itemView.findViewById(R.id.brand_img_iv)

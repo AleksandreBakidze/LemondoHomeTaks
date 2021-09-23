@@ -61,7 +61,7 @@ class HomeFragment : Fragment() {
         lemondoRecyclerView = binding.recyclerViewId
         lemondoRecyclerView.layoutManager =
             LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, false)
-        lemondoRecyclerView.setHasFixedSize(true)
+        //lemondoRecyclerView.setHasFixedSize(true)
         lemondoArrayList = arrayListOf<Shop>()
 
         getData()
