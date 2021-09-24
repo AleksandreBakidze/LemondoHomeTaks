@@ -93,14 +93,11 @@ class ShopAdapter(private val shopList: List<Shop>) :
             holder.closedBlur.isVisible = true
 
             if (currentDay + 1 == 7){
-
                 currentDay = 0
-
                 currentPosition.workingHours[currentDay]
 
                 if (dayOrNight == nightTime) {
                     holder.openingTime.text = currentPosition.workingHours[currentDay].day + " " + currentPosition.workingHours[currentDay].from
-
                 } else {
                     holder.openingTime.text = currentPosition.workingHours[currentDay + 6].day + " " + currentPosition.workingHours[currentDay + 6].from
                 }
@@ -108,11 +105,13 @@ class ShopAdapter(private val shopList: List<Shop>) :
             }else{
                 if (dayOrNight == nightTime) {
                     holder.openingTime.text = currentPosition.workingHours[currentDay + 1].day + " " + currentPosition.workingHours[currentDay + 1].from
-                    Log.e("PM", "PM")
-
                 } else {
-                    holder.openingTime.text = currentPosition.workingHours[currentDay].day + " " + currentPosition.workingHours[currentDay].from
-                    Log.e("AM", "AM")
+                    if (!range.contains(convertFinalApiDate) && dayOrNight == dayTime){
+                        holder.openingTime.text = currentPosition.workingHours[currentDay + 1].day + " " + currentPosition.workingHours[currentDay + 1].from
+                    }
+                    else{
+                        holder.openingTime.text = currentPosition.workingHours[currentDay].day + " " + currentPosition.workingHours[currentDay].from
+                    }
                 }
             }
 
